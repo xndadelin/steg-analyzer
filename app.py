@@ -150,6 +150,46 @@ def analyze_with_pngcheck(filepath):
         'error': result.get('stderr', '')
     }
 
+def apply_image_filters(filepath, output_dir):
+    filters_applied = {}
+
+    try:
+        img = Image.open(filepath)
+
+        grayscale = img.convert('L')
+        gray_path = os.path.join(output_dir, 'filter_grayscale.png')
+        grayscale.save(gray_path)
+        filters_applied['grayscale'] = gray_path
+
+        enhancer = ImageEnhance.Contrast(img)
+        high_contrast = enhancer.enhance(3.0)
+        contrast_path = os.path.join(output_dir, 'filter_high_contrast.png')
+        high_contrast.save(contrast_path)
+        filters_applied['high_contratst'] = contrast_path
+
+        edges = img.filter(ImageFilter.FIND_EDGES)
+        edges_path = os.path.join(output_dir, 'filter_edges.png')
+        edges.save(edges_path)
+        filters_applied['edges'] = edges_path
+
+        brightness = ImageEnhance.Brightness(img)
+        bright = brightness.enhance(2.0)
+        bright_path = os.path.join(output_dir, 'filter_brightness.png')
+        bright.save(bright_path)
+        filters_applied['brightness'] = bright_path
+
+        if img.mode == 'RGB':
+            inverted = Image.eval(img, lambda x: 255 - x)
+            inverted_path = os.path.join(output_dir, 'filter_inverted.png')
+            inverted.save(inverted_path)
+            filters_applied['inverted'] = inverted_path
+    
+    except Exception as e:
+        filters_applied['error'] = str(e)
+
+    return filters_applied
+
+
 @app.route('/')
 def index():
     return """
