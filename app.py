@@ -111,6 +111,20 @@ def analyze_with_exiftool(filepath):
         'error': result.get('stderr', '')
     }
 
+def analyze_with_string(filepath):
+    command = f"string {filepath}"
+    result = run_command(command)
+
+    strings_output = result.get('stdout', '')
+    lines = strings_output.split('\n')[:1000] # might increase this, will see how it performs and then i will decide ig
+
+    return {
+        'tool': 'strings',
+        'success': result['success'],
+        'strings': '\n'.join(lines),
+        'total_lines': len(strings_output.split('\n')),
+        'error': result.get('stderr', '')
+    }
 
 @app.route('/')
 def index():
