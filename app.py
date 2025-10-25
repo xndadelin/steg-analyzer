@@ -8,7 +8,7 @@ import uuid
 from PIL import Image, ImageEnhance, ImageFilter
 import io
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['OUTPUT_FOLDER'] = 'output'
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
