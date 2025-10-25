@@ -23,7 +23,7 @@ RUN gem install zsteg
 WORKDIR /app
 
 COPY requirements.txt .
-COPY static/app.js .
+COPY static/ ./static
 
 RUN pip3 install --no-cache-dir -r requirements.txt
 
