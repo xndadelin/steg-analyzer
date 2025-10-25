@@ -112,7 +112,7 @@ def analyze_with_exiftool(filepath):
     }
 
 def analyze_with_string(filepath):
-    command = f"string {filepath}"
+    command = f"strings {filepath}"
     result = run_command(command)
 
     strings_output = result.get('stdout', '')
