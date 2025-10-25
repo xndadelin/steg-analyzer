@@ -196,5 +196,55 @@ def index():
     <h1>hello, steg-analyzer!</h1>
 """
 
+@app.route('/analyze', methods=['POST'])
+def analyze():
+    if 'file' not in request.files:
+        return jsonify({'error': 'no file uploaded'}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'no selected file'}), 400
+    
+    if file and allowed_file(file.filename):
+        analysis_id = str(uuid.uuid4())
+
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], f"{analysis_id}_{filename}")
+        file.save(filepath)
+
+        output_dir = os.path.join(app.config['OUTPUT_FOLDER'], analysis_id)
+        os.makedirs(output_dir, exist_ok=True)
+
+        file_type = get_file_type(filepath)
+        file_ext = filename.rsplit('.', 1)[1].lower()
+
+        results = {
+            'analysis_id': analysis_id,
+            'filename': filename,
+            'file_type': file_type,
+            'file_extension': file_ext,
+            'analyses': []
+        }
+
+        results['analyses'].append(analyze_with_exiftool(filepath))
+        results['analyses'].append(analyze_with_string(filepath))
+        results['analyses'].append(analyze_with_binwalk(filepath, output_dir))
+        results['analyses'].append(analyze_with_foremost(filepath, output_dir))
+
+        if file_ext in ['png']:
+            results['analyses'].append(analyze_with_zsteg(filepath))
+            results['analyses'].append(analyze_with_pngcheck(filepath))
+
+        if file_ext in ['bmp']:
+            results['analyses'].append(analyze_with_zsteg(filepath))
+
+        filters = apply_image_filters(filepath, output_dir)
+        results['filters'] = filters
+
+        return jsonify(results)
+    
+    return jsonify({'error': 'file type not allowed'}), 400
+
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
