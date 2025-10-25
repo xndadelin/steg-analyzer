@@ -412,6 +412,41 @@
             return div.innerHTML;
         }
 
+        if(data.filters && Object.keys(data.filters).length > 0) {
+            const filtersContainer = document.getElementById('filtersContainer');
+            const filtersCard = document.getElementById('filtersCard');
+            filtersContainer.innerHTML = '';
+
+            const filterNames = {
+                'grasycale': 'Grayscale',
+                'high_contrast': 'High contrast',
+                'edges': 'Edge detection',
+                'brightness': 'Increased brightness',
+                'inverted': 'Inverted colors',
+                'sharpened': 'Sharpened'
+            }
+
+            Object.keys(data.filters).forEach(filterKey => {
+                const col = document.createElement('div');
+                col.className = 'col-md-4 mb-3';
+                col.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h6>${filterNames[filterKey] || filterKey}</h6>
+                            <img src="/filter/${data.analysis_id}/${filterKey}" class="filter-img" alt="${filterKey}">
+                        </div>
+                    </div>
+                `;
+                filtersContainer.appendChild(col);
+            }) 
+            filtersCard.style.display = 'block'
+        }
+
+        results.style.display = 'block';
+        results.scrollIntoView({
+            behavior: 'smooth'
+        })
+
     </script>
 </body>
 </html>
