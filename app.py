@@ -192,9 +192,7 @@ def apply_image_filters(filepath, output_dir):
 
 @app.route('/')
 def index():
-    return """
-    <h1>hello, steg-analyzer!</h1>
-"""
+    return render_template('index.html')
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
