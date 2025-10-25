@@ -1,0 +1,20 @@
+version: '3.8'
+
+services: 
+  steg-analyzer:
+    build: .
+    ports: 
+      - "5000:5000"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./output:/app/output
+    environment:
+      - FLASK_ENV=production
+      - MAX_CONTENT/-LENGTH=52428800
+    restart: unless-stopped
+    networks:
+      - steg-network
+
+networks:
+  steg-network:
+    driver: bridge
