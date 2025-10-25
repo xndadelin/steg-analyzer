@@ -63,7 +63,7 @@ def run_command(command, timeout=500):
         }
     
 def analyze_with_binwalk(filepath, output_dir):
-    command = f"binwalk --extract --directory={output_dir} {filepath}"
+    command = f"binwalk --extract --run-as=root --directory={output_dir} {filepath}"
     result = run_command(command)
 
     extracted_files = []
