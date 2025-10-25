@@ -126,6 +126,17 @@ def analyze_with_string(filepath):
         'error': result.get('stderr', '')
     }
 
+def analyze_with_zsteg(filepath):
+    command = f"zsteg {filepath}"
+    result = run_command(command)
+
+    return {
+        'tool': 'zsteg',
+        'success': result['success'],
+        'output': result.get('stdout', ''),
+        'error': result.get('stderr', '')
+    }
+
 @app.route('/')
 def index():
     return """
