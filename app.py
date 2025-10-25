@@ -61,6 +61,24 @@ def run_command(command, timeout=500):
             'success': False,
             'error': str(e)
         }
+    
+def analyze_with_binwalk(filepath, output_dir):
+    command = f"binwalk -dd='*' -e {filepath} -C {output_dir}"
+    result = run_command(command)
+
+    extracted_files = []
+    if os.path.exists(output_dir):
+        for root, dirs, files in os.walk(output_dir):
+            for file in files:
+                extracted_files.append(os.path.join(root, file))
+    
+    return {
+        'tool': 'binwalk',
+        'result': result['success'],
+        'output': result.get('stdout', ''),
+        'error': result.get('error', ''),
+        'extracted_files': extracted_files
+    }
 
 @app.route('/')
 def index():
