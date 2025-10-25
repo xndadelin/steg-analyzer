@@ -80,6 +80,27 @@ def analyze_with_binwalk(filepath, output_dir):
         'extracted_files': extracted_files
     }
 
+def analyze_with_foremost(filepath, output_dir):
+    command = f"foremost -i {filepath} -o {output_dir}/foremost_output"
+    result = run_command(command)
+
+    recovered_files = []
+    foremost_dir = os.path.join(output_dir, 'foremost_output')
+    if os.path.exists(foremost_dir):
+        for root, dirs, files in os.walk(foremost_dir):
+            for file in files:
+                if file != 'audit.txt':
+                    recovered_files.append(os.path.join(root, file))
+
+    return {
+        'tool': 'foremost',
+        'result': result['success'],
+        'output': result.get('stdout', ''),
+        'error': result.get('error', ''),
+        'recovered_files': recovered_files
+    }
+
+
 @app.route('/')
 def index():
     return """
