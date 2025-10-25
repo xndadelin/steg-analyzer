@@ -63,7 +63,7 @@ def run_command(command, timeout=500):
         }
     
 def analyze_with_binwalk(filepath, output_dir):
-    command = f"binwalk -dd='*' -e {filepath} -C {output_dir}"
+    command = f"binwalk --extract --directory={output_dir} {filepath}"
     result = run_command(command)
 
     extracted_files = []
@@ -74,7 +74,7 @@ def analyze_with_binwalk(filepath, output_dir):
     
     return {
         'tool': 'binwalk',
-        'result': result['success'],
+        'success': result['success'],
         'output': result.get('stdout', ''),
         'error': result.get('stderr', ''),
         'extracted_files': extracted_files
@@ -85,6 +85,7 @@ def analyze_with_foremost(filepath, output_dir):
     result = run_command(command)
 
     recovered_files = []
+    audit_file = os.path.join(output_dir, 'foremost_output', 'audit.txt')
     foremost_dir = os.path.join(output_dir, 'foremost_output')
     if os.path.exists(foremost_dir):
         for root, dirs, files in os.walk(foremost_dir):
@@ -92,11 +93,16 @@ def analyze_with_foremost(filepath, output_dir):
                 if file != 'audit.txt':
                     recovered_files.append(os.path.join(root, file))
 
+    content_of_audit = ''
+    if os.path.exists(audit_file):
+        with open(audit_file, 'r') as f:
+            content_of_audit = f.read()
+
     return {
         'tool': 'foremost',
-        'result': result['success'],
-        'output': result.get('stdout', ''),
-        'error': result.get('stderr', ''),
+        'success': result['success'],
+        'output': content_of_audit,
+        'error': '' if 'Processing' in result.get('stderr', '') else result.get('stderr', ''),
         'recovered_files': recovered_files
     }
 
@@ -106,7 +112,7 @@ def analyze_with_exiftool(filepath):
 
     return {
         'tool': 'exiftool',
-        'result': result['success'],
+        'success': result['success'],
         'metadata': result.get('stdout', ''),
         'error': result.get('stderr', '')
     }
@@ -165,7 +171,7 @@ def apply_image_filters(filepath, output_dir):
         high_contrast = enhancer.enhance(3.0)
         contrast_path = os.path.join(output_dir, 'filter_high_contrast.png')
         high_contrast.save(contrast_path)
-        filters_applied['high_contratst'] = contrast_path
+        filters_applied['high_contrast'] = contrast_path
 
         edges = img.filter(ImageFilter.FIND_EDGES)
         edges_path = os.path.join(output_dir, 'filter_edges.png')

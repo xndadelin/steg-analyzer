@@ -1,54 +1,66 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        Steganography analysis tool
-    </title>
+    <title>Steganography analysis tool</title>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        .code-output {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .code-output pre {
+            margin: 0;
+        }
+    </style>
 </head>
+
 <body class="min-h-screen bg-base-300">
     <header class="navbar bg-base-100 shadow-lg">
         <div class="flex-1 container mx-auto">
-            <a class="text-xl font-bold">
-                stegoanalyzer
-            </a>
+            <a class="text-xl font-bold">stegoanalyzer</a>
         </div>
     </header>
 
     <main class="container mx-auto p-6 max-w-6xl">
         <section id="uploadSection" class="card bg-base-100 shadow-xl mb-6">
             <div class="card-body">
-                <h2 class="card-title text-2xl mb-4">Upload image</h2>
+                <h2 class="card-title text-2xl mb-6">Upload image</h2>
 
                 <form id="uploadForm">
-                    <div id="dropzone" class="border-2 border-dashed border-primary rounded-lg p-12 text-center cursor-pointer hover:border-secondary hover:bg-base-200 translation-all">
+                    <div id="dropzone"
+                        class="border-2 border-dashed border-primary rounded-lg p-12 text-center cursor-pointer hover:border-secondary hover:bg-base-200 transition-all">
                         <input type="file" id="fileInput" accept="image/*" class="hidden">
                         <div id="dropText">
-                            <svg class="w-16 h-16 mx-auto mb-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            <svg class="w-16 h-16 mx-auto mb-4 text-primary" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                </path>
                             </svg>
-                            <p class="text-lg font-semibold mb-2">Drag image here or click to browser</p>
-                            <p class="text-sm opacity-60">
-                                PNG, JPG, JPEG, BMP, GIF, TIFF • Max size: 50 MB
-                            </p>
+                            <p class="text-lg font-semibold mb-2">Drag image here or click to browse</p>
+                            <p class="text-sm opacity-60">PNG, JPG, JPEG, BMP, GIF, TIFF • Max size: 50 MB</p>
                         </div>
                         <div id="fileSelected" class="hidden">
-                            <svg class="w-16 h-16 mx-auto mb-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            <svg class="w-16 h-16 mx-auto mb-4 text-success" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                             <p id="fileName" class="text-lg font-semibold mb-4"></p>
-                            <button type="button" id="changeFile" class="btn btn-sm btn-ghost">
-                                Change file
-                            </button>
+                            <button type="button" id="changeFile" class="btn btn-sm btn-ghost">Change file</button>
                         </div>
                     </div>
+
                     <div class="text-center mt-6">
                         <button type="submit" class="btn btn-primary btn-lg">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
                             Analyze image
                         </button>
@@ -57,19 +69,17 @@
 
                 <div id="loading" class="hidden mt-6 text-center">
                     <span class="loading loading-spinner loading-lg text-primary"></span>
-                    <p class="mt-4 text-lg">
-                        Analyzing image...this might just take a few moments. You can relax :3
-                    </p>
+                    <p class="mt-4 text-lg">Analyzing image... this might just take a few moments. You can relax :3</p>
                     <progress class="progress progress-primary w-full mt-4"></progress>
                 </div>
             </div>
-        </section> 
+        </section>
 
         <div id="results" class="hidden space-y-6">
             <section class="card bg-base-100 shadow-xl">
                 <div class="card-body">
-                    <h2 class="card-title">File information</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <h2 class="card-title mb-4">File information</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="stat bg-base-200 rounded-lg">
                             <div class="stat-title">Filename</div>
                             <div class="stat-value text-lg" id="resFilename"></div>
@@ -86,18 +96,18 @@
                 </div>
             </section>
 
-            <section id="analysisResults"></section>
+            <section id="analysisResults" class="gap-4 flex flex-col"></section>
 
             <section id="filtersSection" class="card bg-base-100 shadow-xl hidden">
                 <div class="card-body">
-                    <h2 class="card-title">Visual filters</h2>
-                    <div id="filtersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4"></div>
+                    <h2 class="card-title mb-4">Visual filters</h2>
+                    <div id="filtersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
             </section>
         </div>
     </main>
 
     <script src="/static/app.js"></script>
-
 </body>
+
 </html>
