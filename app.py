@@ -137,6 +137,19 @@ def analyze_with_zsteg(filepath):
         'error': result.get('stderr', '')
     }
 
+# to do: figure out how to install stegoveritas :skull: without pip3
+
+def analyze_with_pngcheck(filepath):
+    command = f"pngcheck {filepath}"
+    result = run_command(command)
+
+    return {
+        'tool': 'pngcheck',
+        'success': result['success'],
+        'output': result.get('stdout', ''),
+        'error': result.get('stderr', '')
+    }
+
 @app.route('/')
 def index():
     return """
