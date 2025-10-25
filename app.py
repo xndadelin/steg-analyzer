@@ -28,6 +28,14 @@ os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def get_file_type(filepath):
+    try:
+        mime = magic.Magic(mime=True)
+        file_type = mime.from_file(filepath)
+        return file_type
+    except:
+        return "unknown"
+
 @app.route('/')
 def index():
     return """
