@@ -76,7 +76,7 @@ def analyze_with_binwalk(filepath, output_dir):
         'tool': 'binwalk',
         'result': result['success'],
         'output': result.get('stdout', ''),
-        'error': result.get('error', ''),
+        'error': result.get('stderr', ''),
         'extracted_files': extracted_files
     }
 
@@ -96,8 +96,19 @@ def analyze_with_foremost(filepath, output_dir):
         'tool': 'foremost',
         'result': result['success'],
         'output': result.get('stdout', ''),
-        'error': result.get('error', ''),
+        'error': result.get('stderr', ''),
         'recovered_files': recovered_files
+    }
+
+def analyze_with_exiftool(filepath):
+    command = f"exiftool {filepath}"
+    result = run_command(command)
+
+    return {
+        'tool': 'exiftool',
+        'result': result['success'],
+        'metadata': result.get('stdout', ''),
+        'error': result.get('stderr', '')
     }
 
 
