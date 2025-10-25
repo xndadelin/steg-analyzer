@@ -245,6 +245,22 @@ def analyze():
     
     return jsonify({'error': 'file type not allowed'}), 400
 
+@app.route('/download/<analysis_id>/<path:filename>')
+def download_file(analysis_id, filename):
+    file_path = os.path.join(app.config['OUTPUT_FOLDER'], analysis_id, filename)
+    if os.path.exists(file_path):
+        return send_file(file_path, as_attachment=True)
+    
+    return "File not found", 404
+
+@app.route('/filter/<analysis_id>/<filter_name>')
+def get_filter(analysis_id, filter_name):
+    filter_path = os.path.join(app.config['OUTPUT_FOLDER'], analysis_id, f'filter_{filter_name}.png')
+    if os.path.exists(filter_path):
+        return send_file(filter_path, as_attachment=True)
+
+    return "Filter not found", 404
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
