@@ -1,452 +1,103 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
         Steganography analysis tool
     </title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <style>
-        :root {
-            --primary-color: #10b981;
-            --primary-hover: #059669;
-            --secondary-color: #22d3ee;
-            --bg-dark: #252a2b;
-            --bg-darker: #181d20;
-            --card-bg: #12181a;
-            --card-header: #161b1d;
-            --border-color: #1f2937;
-            --text-primary: #e5e7eb;
-            --text-secondary: #9ca3af;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-primary);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .navbar {
-            background-color: var(--bg-darker) !important;
-            border-bottom: 2px solid var(--primary-color);
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-            color: #000;
-            font-weight: 600;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-            border-color: var(--primary-hover);
-            color: #000;
-        }
-
-        .btn-secondary {
-            background-color: var(--secondary-color);
-            border-color: var(--secondary-color);
-            color: var(--text-primary);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--secondary-color);
-            border-color: var(--secondary-color);
-            color: var(--text-primary);
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            margin-bottom: 1.5rem;
-        }
-
-        .card-header {
-            background-color: var(--card-header);
-            border-bottom: 1px solid var(--primary-color);
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .analysis-output {
-            background-color: var(--bg-darker);
-            border: 1px solid var(--border-color);
-            padding: 1rem;
-            border-radius: 0.375rem;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.875rem;
-            max-height: 400px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-wrap: break-word
-        }
-
-        .upload-area {
-            border: 2px dashed var(--primary-color);
-            padding: 3rem;
-            border-radius: 0.5rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .upload-area:hover {
-            border-color: var(--secondary-color);
-            background: var(--bg-darker);
-        }
-
-        .upload-area.dragging {
-            background-color: var(--bg-darker);
-            border-color: var(--secondary-color);
-        }
-
-        .spinner-border {
-            color: var(--primary-color);
-        }
-
-        .filter-img {
-            max-width: 100%;
-            height: auto;
-            border: 1px solid var(--border-color);
-            border-radius: 0.375rem;
-            margin-top: 0.5rem
-        }   
-
-        .file-link {
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-
-        .file-link:hover {
-            color: var(--secondary-color);
-            text-decoration: underline;
-        }
-
-        .badge {
-            background-color: var(--primary-color);
-        }
-
-        .alert-info {
-            background-color: var(--bg-darker);
-            border-color: var(--primary-color);
-            color: var(--text-primary);
-        }
-
-        #results {
-            display: none;
-        }
-
-        .progress {
-            background-color: var(--bg-darker);
-        }
-
-        .progress-bar {
-            background-color: var(--primary-color);
-        }
-        
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <span class="navbar-brand mb-0 h1">
-                Steganography analysis tool
-            </span>
+<body class="min-h-screen bg-base-300">
+    <header class="navbar bg-base-100 shadow-lg">
+        <div class="flex-1 container mx-auto">
+            <a class="text-xl font-bold">
+                stegoanalyzer
+            </a>
         </div>
-    </nav>
+    </header>
 
-    <div class="mt-4 container" style="max-width: 800px; text-align: center;">
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        Upload image for analysis
-                    </div>
-                    <div class="card-body">
-                        <form id="uploadForm" enctype="multipart/form-data">
-                            <div class="upload-area" id="uploadArea">
-                                <input type="file" id="fileInput" name="file" accept="image/*" style="display: none;">
-                                <div id="uploadText">
-                                    <h4>Drag image here or click to browse</h4>
-                                    <p class="text-muted">Supported formats: PNG, JPG, JPEG, BMP, GIF, TIFF</p>
-                                    <p class="text-muted">Max file size: 50MB</p>
-                                </div>
-                                <div id="selectedFile" style="display: none;">
-                                    <h5 id="fileName"></h5>
-                                </div>
-                                <button type="button" class="btn btn-secondary btn-sm mt-2" id="changeFile">
-                                    Change file
-                                </button>
-                            </div>
-                            <div class="text-center mt-3">
-                                <button type="submit" class="btn btn-primary btn-lg" id="analyzeBtn">
-                                    Analyze image
-                                </button>
-                            </div>
-                        </form>
+    <main class="container mx-auto p-6 max-w-6xl">
+        <section id="uploadSection" class="card bg-base-100 shadow-xl mb-6">
+            <div class="card-body">
+                <h2 class="card-title text-2xl mb-4">Upload image</h2>
 
-                        <div id="loadingSection" class="mt-4" style="display: none;">
-                            <div class="text-center">
-                                <div class="spinner-border" role="status">
-                                    <span class="visually-hidden">
-                                        Loading...
-                                    </span>
-                                </div>
-                                <p class="mt-2">Analyzing image...this may take a while. Read a book until then!</p>
-                                <div class="progress mt-3">
-                                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%;"></div>
-                                </div>
-                            </div>
+                <form id="uploadForm">
+                    <div id="dropzone" class="border-2 border-dashed border-primary rounded-lg p-12 text-center cursor-pointer hover:border-secondary hover:bg-base-200 translation-all">
+                        <input type="file" id="fileInput" accept="image/*" class="hidden">
+                        <div id="dropText">
+                            <svg class="w-16 h-16 mx-auto mb-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            <p class="text-lg font-semibold mb-2">Drag image here or click to browser</p>
+                            <p class="text-sm opacity-60">
+                                PNG, JPG, JPEG, BMP, GIF, TIFF • Max size: 50 MB
+                            </p>
+                        </div>
+                        <div id="fileSelected" class="hidden">
+                            <svg class="w-16 h-16 mx-auto mb-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <p id="fileName" class="text-lg font-semibold mb-4"></p>
+                            <button type="button" id="changeFile" class="btn btn-sm btn-ghost">
+                                Change file
+                            </button>
                         </div>
                     </div>
-                    <div id="results">
-                        <div class="card">
-                            <div class="card-header">
-                                File information
-                            </div>
-                            <div class="card-body">
-                                <p>
-                                    <strong>Filename: </strong>
-                                    <span id="resFilename"></span>
-                                </p>
-                                <p>
-                                    <strong>Filetype: </strong>
-                                    <span id="resFileType"></span>
-                                </p>
-                                <p>
-                                    <strong>Extension: </strong>
-                                    <span id="resExtension"></span>
-                                </p>
-                            </div>
-                        </div>
-
-                        <div id="analysisResults"></div>
-
-                        <div class="card" id="filtersCard" style="display: none;">
-                            <div class="card-header">
-                                Image filters (visual analysis)
-                            </div>
-                            <div class="card-body">
-                                <div class="row" id="filtersContainer"></div>
-                            </div>
-                        </div>
-
+                    <div class="text-center mt-6">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            Analyze image
+                        </button>
                     </div>
+                </form>
+
+                <div id="loading" class="hidden mt-6 text-center">
+                    <span class="loading loading-spinner loading-lg text-primary"></span>
+                    <p class="mt-4 text-lg">
+                        Analyzing image...this might just take a few moments. You can relax :3
+                    </p>
+                    <progress class="progress progress-primary w-full mt-4"></progress>
+                </div>
             </div>
+        </section> 
+
+        <div id="results" class="hidden space-y-6">
+            <section class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <h2 class="card-title">File information</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                        <div class="stat bg-base-200 rounded-lg">
+                            <div class="stat-title">Filename</div>
+                            <div class="stat-value text-lg" id="resFilename"></div>
+                        </div>
+                        <div class="stat bg-base-200 rounded-lg">
+                            <div class="stat-title">File type</div>
+                            <div class="stat-value text-lg" id="resFileType"></div>
+                        </div>
+                        <div class="stat bg-base-200 rounded-lg">
+                            <div class="stat-title">Extension</div>
+                            <div class="stat-value text-lg" id="resExtension"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="analysisResults"></section>
+
+            <section id="filtersSection" class="card bg-base-100 shadow-xl hidden">
+                <div class="card-body">
+                    <h2 class="card-title">Visual filters</h2>
+                    <div id="filtersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4"></div>
+                </div>
+            </section>
         </div>
-    </div>
+    </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    <script>
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
-        const uploadForm = document.getElementById('uploadForm');
-        const analyzeBtn = document.getElementById('analyzeBtn');
-        const loadingSection = document.getElementById('loadingSection');
-        const results = document.getElementById('results');
-        const uploadText = document.getElementById('uploadText');
-        const selectedFile = document.getElementById('selectedFile');
-        const fileName = document.getElementById('fileName');
-        const changeFileBtn = document.getElementById('changeFile');
+    <script src="/static/app.js"></script>
 
-        uploadArea.addEventListener('click', (e) => {
-            if(e.target !== changeFileBtn && !changeFileBtn.contains(e.target)) {
-                fileInput.click();
-            }
-        })
-        
-        changeFileBtn.addEventListener('click', () => {
-            fileInput.click();
-        })
-
-        fileInput.addEventListener('change', (e) => {
-            if(e.target.files.length > 0) {
-                const file = e.target.files[0];
-                fileName.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-                uploadText.style.display = 'none';
-                selectedFile.style.display = 'block';
-            }
-        })
-
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('dragging');
-        })
-
-        uploadArea.addEventListener('dragleave', (e) => {
-            uploadArea.classList.remove('dragging')
-        })
-
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragging');
-
-            const files = e.dataTransfer.files;
-            if(files.length > 0) {
-                fileInput.files = files;
-                const file = files[0];
-                fileName.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-                uploadText.style.display = 'none';
-                selectedFile.style.display = 'block';
-            }
-        })
-
-        uploadForm.addEventListener('submit', async(e) => {
-            e.preventDefault();
-            if (!fileInput.files.length) {
-                alert('Please select a file to analyze.');
-                return ;
-            }
-
-            const formData = new FormData();
-            formData.append('file', fileInput.files[0]);
-
-            analyzeBtn.disabled = true;
-            loadingSection.style.display = 'block';
-            results.style.display = 'none';
-
-            try {
-                const response = await fetch('/analyze', {
-                    method: 'POST',
-                    body: formData
-                })
-
-                const data = await response.json();
-
-                if(response.ok) {
-                    displayResults(data);
-                } else {
-                    alert(data.error || 'an error occured during analysis.');
-                }
-            } catch (error) {
-                alert(error.message)
-            } finally {
-                analyzeBtn.disabled = false;
-                loadingSection.style.display = 'none';
-            }
-        })
-
-        function displayResults(data) {
-            document.getElementById('resFilename').textContent = data.filename;
-            document.getElementById('resFileType').textContent = data.file_type;
-            document.getElementById('resExtension').textContent = data.file_extension;
-
-            const analysisContainer = document.getElementById('analysisResults');
-            analysisContainer.innerHTML = '';
-
-            data.analyses.forEach(analysis => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                
-                let cardContent = `
-                    <div class="card-header">
-                        ${analysis.tool} analysis
-                        <span class="badge float-end">${analysis.success ? 'Success' : 'Failed'}
-                    </div>
-                    <div class="card-body">
-                `
-                if(analysis.tool === 'exiftool' && analysis.metadata) {
-                    cardContent += `
-                        <div class="analysis-output">
-                            ${escapeHtml(analysis.metadata)}
-                        </div>
-                    `
-                } else if (analysis.tool === 'strings' && analysis.strings) {
-                    cardContent += `
-                        <p><strong>Total lines found:</strong> ${analysis.total_lines}</p>
-                        <p class="text-muted">Showing first 100 lines:</p>
-                        <div class="analysis-output">
-                            ${escapeHtml(analysis.strings)}
-                        </div>
-                    `
-                } else if(analysis.tool === 'binwalk') {
-                    cardContent += `
-                        <div class="analysis-output">
-                            ${escapeHtml(analysis.output)}
-                        </div>
-                    `
-                    if(analysis.recovered_files && analysis.recovered_files.length > 0) {
-                        cardContent += `
-                            <div class="mt-3">
-                                <strong>Recovered files:</strong>
-                                <ul>
-                            </div>
-                        `
-                        analysis.recovered_files.forEach(file => {
-                            const relativePath = file.split(data.analysis_id + '/')[1];
-                            cardContent += `
-                                <li><a href="/download.${data.analysis_id}/${relativePath}" class="file-link" target="_blank">${relativePath}</a></li>
-                            `
-                        })
-                        cardContent += `
-                                </ul> </div>     
-                            `
-                    }
-                } else if(analysis.output) {
-                    cardContent += `
-                        <div class="analysis-output">
-                            ${escapeHtml(analysis.output)}
-                        </div>
-                    `
-                }
-
-                if(analysis.error && analysis.error.trim()) {
-                    cardContent += `
-                        <div class="alert alert-danger mt-3" role="alert">
-                            <strong>Error: </strong> ${escapeHtml(analysis.error)} 
-                        </div>
-                    `
-                }
-
-                cardContent += `</div>`;
-                card.innerHTML = cardContent;
-                analysisContainer.appendChild(card);
-            })
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        if(data.filters && Object.keys(data.filters).length > 0) {
-            const filtersContainer = document.getElementById('filtersContainer');
-            const filtersCard = document.getElementById('filtersCard');
-            filtersContainer.innerHTML = '';
-
-            const filterNames = {
-                'grasycale': 'Grayscale',
-                'high_contrast': 'High contrast',
-                'edges': 'Edge detection',
-                'brightness': 'Increased brightness',
-                'inverted': 'Inverted colors',
-                'sharpened': 'Sharpened'
-            }
-
-            Object.keys(data.filters).forEach(filterKey => {
-                const col = document.createElement('div');
-                col.className = 'col-md-4 mb-3';
-                col.innerHTML = `
-                    <div class="card">
-                        <div class="card-body">
-                            <h6>${filterNames[filterKey] || filterKey}</h6>
-                            <img src="/filter/${data.analysis_id}/${filterKey}" class="filter-img" alt="${filterKey}">
-                        </div>
-                    </div>
-                `;
-                filtersContainer.appendChild(col);
-            }) 
-            filtersCard.style.display = 'block'
-        }
-
-        results.style.display = 'block';
-        results.scrollIntoView({
-            behavior: 'smooth'
-        })
-
-    </script>
 </body>
 </html>
