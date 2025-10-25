@@ -34,7 +34,33 @@ def get_file_type(filepath):
         file_type = mime.from_file(filepath)
         return file_type
     except:
-        return "unknown"
+        return "unknown" 
+    
+def run_command(command, timeout=500):
+    try:
+        result = subprocess.run(
+            command,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=timeout
+        )
+        return {
+            'success': True,
+            'stdout': result.stdout,
+            'stderr': result.stderr,
+            'returncode': result.returncode
+        }
+    except subprocess.TimeoutExpired:
+        return {
+            'success': False,
+            'error': 'Command timed out. Please try again or contact support if the issue persists.'
+        }
+    except Exception as e:
+        return {
+            'success': False,
+            'error': str(e)
+        }
 
 @app.route('/')
 def index():
